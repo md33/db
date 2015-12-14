@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication2", "WindowsFormsApplication2\WindowsFormsApplication2.csproj", "{C77D6282-9958-4FF0-8150-851E9B5405FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DP", "WindowsFormsApplication2\DP.csproj", "{C77D6282-9958-4FF0-8150-851E9B5405FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

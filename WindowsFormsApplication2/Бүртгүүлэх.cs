@@ -16,7 +16,9 @@ namespace WindowsFormsApplication2
     public partial class Бүртгүүлэх : Form
     {
         public String name;
- 
+        SqlConnection con;
+        Key key;
+
         public Бүртгүүлэх(String name)
         {
             InitializeComponent();
@@ -24,10 +26,13 @@ namespace WindowsFormsApplication2
             Aname.Hide();
             Aname.Text = name;
             password1.PasswordChar = '*';
-            password.PasswordChar ='*';
+            password.PasswordChar = '*';
+            String connetionString = null;
+            connetionString = "Data Source=MD\\SQLEXPRESS;Initial Catalog=lab;Integrated Security=True";
+            con = new SqlConnection(connetionString);
+            key = new Key();
 
 
-           
         }
 
         private void butsah_Click(object sender, EventArgs e)
@@ -54,18 +59,19 @@ namespace WindowsFormsApplication2
             if (id.Text != string.Empty && dob.Text != string.Empty && lname.Text != string.Empty && fname.Text != string.Empty && gender.Text != string.Empty && password.Text != string.Empty)
             {
 
+
                 if (password.Text.Equals(password1.Text))
                 {
-                 
-                     int affectedRows = 0;
-                    string connetionString = null;
-                    connetionString = "Data Source=MD\\SQLEXPRESS;Initial Catalog=lab;Integrated Security=True";
-                   // connetionString = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
-                    SqlConnection con = new SqlConnection(connetionString);
+
+                    int affectedRows = 0;
+                    int error = 0;
+
+                    // connetionString = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
+
                     SqlCommand cmd = new SqlCommand();
 
                     //string myQuery = "INSERT INTO dbo.Employees (Name, DoB, Gender, Address, AddedBy, AddedDate) VALUES(@Name, @DoB, @Gender, @Address, @AddedBy, @AddedDate)";
-                    string myQuery = "dbo.InsertNewEmployees";
+                    string myQuery = "InsertNewEmployee";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandText = myQuery;
                     cmd.Parameters.Add("@id", SqlDbType.NChar);
@@ -73,7 +79,7 @@ namespace WindowsFormsApplication2
                     cmd.Parameters.Add("@lname", SqlDbType.NChar);
                     cmd.Parameters.Add("@fname", SqlDbType.NChar);
                     cmd.Parameters.Add("@gender", SqlDbType.NChar);
-                    cmd.Parameters.Add("@age", SqlDbType.Int);                    
+                    cmd.Parameters.Add("@age", SqlDbType.Int);
                     cmd.Parameters.Add("@added", SqlDbType.DateTime);
                     cmd.Parameters.Add("@addedBy", SqlDbType.NChar);
                     cmd.Parameters.Add("@password", SqlDbType.NChar);
@@ -85,47 +91,57 @@ namespace WindowsFormsApplication2
                     cmd.Parameters["@age"].Value = age.Text;
                     cmd.Parameters["@added"].Value = DateTime.Now;
                     cmd.Parameters["@addedBy"].Value = Aname.Text;
-                    String encrypt;
-                    encrypt = Encrypt(password.Text.ToString());
-                    cmd.Parameters["@password"].Value = encrypt;          
+                    String hash;
+                     hash = key.MD5Hash(password.Text);
+                    cmd.Parameters["@password"].Value = hash;
                     SqlParameter sqlP = cmd.Parameters.Add("@ReturnValue", SqlDbType.Int);
                     sqlP.Direction = ParameterDirection.ReturnValue;
+                    SqlCommand cmd1 = new SqlCommand();
+                    string myQuery1 = "createLogin";
+                    cmd1.CommandType = CommandType.StoredProcedure;
+                    cmd1.CommandText = myQuery1;
+                    cmd1.Parameters.Add("@id", SqlDbType.NChar);
+                    cmd1.Parameters["@id"].Value = id.Text;
+                    SqlParameter sqlP1 = cmd1.Parameters.Add("@ReturnValue", SqlDbType.Int);
+                    sqlP1.Direction = ParameterDirection.ReturnValue;
                     try
                     {
-                        
-                        cmd.Connection = con;
+                        cmd1.Connection = con;
+                        cmd.Connection = con;                   
                         con.Open();
-                        cmd.ExecuteNonQuery();
+                        
+                        cmd.ExecuteNonQuery();                       
                         affectedRows = (int)cmd.Parameters["@ReturnValue"].Value;
-                       
-                        if (affectedRows == 0)
+                        cmd1.ExecuteNonQuery();
+              
+                        error = (int)cmd1.Parameters["@ReturnValue"].Value;
+
+                        if (affectedRows == 0 && error ==1)
                         {
                             MessageBox.Show("Амжилттай хадгалагдлаа");
 
-                            id.Text = "";                            
+                            id.Text = "";
                             dob.Text = DateTime.Now.Date.ToShortDateString();
                             lname.Text = "";
                             fname.Text = "";
                             gender.Text = "";
                             age.Text = "";
                             password.Text = "";
-                     
+                            password1.Text = "";
 
-                            cmd.Dispose();
                             con.Close();
+                            this.Hide();                            
 
                         }
-                        else if (affectedRows == 555)
-                        {
+
                             MessageBox.Show("Хадгалагдсангүй", "Алдаа");
-                        }
-                        else
-                        {
-                           
+                        
+                 
+
                             cmd.Dispose();
                             con.Close();
 
-                        }
+                        
 
                     }
                     catch (Exception ex)
@@ -142,48 +158,6 @@ namespace WindowsFormsApplication2
                 MessageBox.Show("Та бүх мэдээлэлээ үнэн зөв бөглөнө үү !!!");
             }
         }
-        String Encrypt(String encrypt)
-        {
-            String EncryptionKey = "MAKV2SPBNI99212";
-            byte[] clearBytes = Encoding.Unicode.GetBytes(encrypt);
-            using (Aes encryptor = Aes.Create())
-            {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(clearBytes, 0, clearBytes.Length);
-                        cs.Close();
-                    }
-                    encrypt = Convert.ToBase64String(ms.ToArray());
-                }
-            }
-            return encrypt;
-        }
-        String Decrypt(String decrypt)
-        {
-            String EncryptionKey = "MAKV2SPBNI99212";
-            byte[] cipherBytes = Convert.FromBase64String(decrypt);
-            using (Aes encryptor = Aes.Create())
-            {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(cipherBytes, 0, cipherBytes.Length);
-                        cs.Close();
-                    }
-                    decrypt = Encoding.Unicode.GetString(ms.ToArray());
-                }
-            }
-            return decrypt;
-        }
 
         private void тусламжToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -193,6 +167,8 @@ namespace WindowsFormsApplication2
             proc.StartInfo.UseShellExecute = true;
             proc.Start();
         }
+       
+        
     }
-
+ 
 }

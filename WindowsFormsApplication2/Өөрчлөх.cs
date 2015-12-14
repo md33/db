@@ -133,7 +133,7 @@ namespace WindowsFormsApplication2
                 SqlCommand cmd = new SqlCommand();
 
                 //string myQuery = "INSERT INTO dbo.Employees (Name, DoB, Gender, Address, AddedBy, AddedDate) VALUES(@Name, @DoB, @Gender, @Address, @AddedBy, @AddedDate)";
-                string myQuery = "dbo.UpdateEmployees";
+                string myQuery = "dbo.UpdateEmployee";
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = myQuery;
                 cmd.Parameters.Add("@id", SqlDbType.NChar);

@@ -26,7 +26,7 @@ namespace WindowsFormsApplication2
             con = new SqlConnection(connetionString);
            
          
-            check();
+            //check();
 
         }
         void uncheck() {

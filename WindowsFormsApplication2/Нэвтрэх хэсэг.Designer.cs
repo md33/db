@@ -33,11 +33,11 @@
             this.username = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.password = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.тусламжToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.password = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,11 +63,6 @@
             // 
             resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            // 
-            // password
-            // 
-            resources.ApplyResources(this.password, "password");
-            this.password.Name = "password";
             // 
             // label3
             // 
@@ -95,13 +90,18 @@
             resources.ApplyResources(this.тусламжToolStripMenuItem, "тусламжToolStripMenuItem");
             this.тусламжToolStripMenuItem.Click += new System.EventHandler(this.тусламжToolStripMenuItem_Click);
             // 
+            // password
+            // 
+            resources.ApplyResources(this.password, "password");
+            this.password.Name = "password";
+            // 
             // Form1
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.password);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.password);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.username);
@@ -123,11 +123,11 @@
         private System.Windows.Forms.TextBox username;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox password;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem тусламжToolStripMenuItem;
+        private System.Windows.Forms.TextBox password;
     }
 }
 
